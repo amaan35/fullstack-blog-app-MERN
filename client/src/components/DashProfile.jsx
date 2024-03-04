@@ -19,12 +19,13 @@ import {
   deleteUserFailure,
   signOutStart,
   signOutSuccess,
-  signOutFailure
+  signOutFailure,
 } from "../redux/user/userSlice.js";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Link } from "react-router-dom";
 
 export default function DashProfile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setimageFileUrl] = useState(null);
@@ -111,28 +112,28 @@ export default function DashProfile() {
       if (!res.ok) {
         dispatch(deleteUserFailure(data.message));
       } else {
-        dispatch(deleteUserSuccess(data))
+        dispatch(deleteUserSuccess(data));
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
   };
-  const handleSignOut = async () =>{
+  const handleSignOut = async () => {
     try {
-      dispatch(signOutStart())
-      const res = await fetch('/api/user/signout', {
-        method: 'POST'
-      })
+      dispatch(signOutStart());
+      const res = await fetch("/api/user/signout", {
+        method: "POST",
+      });
       const data = await res.json();
-      if(!res.ok){
-        dispatch(signOutFailure(data.message))
-      }else{
-        dispatch(signOutSuccess())
+      if (!res.ok) {
+        dispatch(signOutFailure(data.message));
+      } else {
+        dispatch(signOutSuccess());
       }
     } catch (error) {
-      dispatch(signOutFailure(error.message))
+      dispatch(signOutFailure(error.message));
     }
-  }
+  };
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
@@ -200,15 +201,33 @@ export default function DashProfile() {
           placeholder="password"
           onChange={handleChange}
         />
-        <Button type="submit" gradientDuoTone="purpleToBlue" outline>
-          Update
+        <Button
+          type="submit"
+          gradientDuoTone="purpleToBlue"
+          outline
+          disabled={loading}
+        >
+          {loading ? "Updating..." : "Update"}
         </Button>
+        {currentUser.isAdmin && (
+          <Link to="/create-post">
+            <Button
+              type="button"
+              gradientDuoTone="purpleToBlue"
+              className="w-full"
+            >
+              Create a post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-5">
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
           Delete Account
         </span>
-        <span onClick={handleSignOut} className="cursor-pointer">Sign Out</span>
+        <span onClick={handleSignOut} className="cursor-pointer">
+          Sign Out
+        </span>
       </div>
       <Modal
         show={showModal}
