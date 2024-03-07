@@ -67,28 +67,33 @@ export const deleteUser = async (req, res, next) => {
 
 export const signOut = (req, res, next) => {
   try {
-    res.clearCookie('access_token').status(200).json("User has been signed out");
+    res
+      .clearCookie("access_token")
+      .status(200)
+      .json("User has been signed out");
   } catch (error) {
-    next(error)
+    next(error);
   }
 };
 
-export const getUsers = async (req, res, next)=>{
-  if(!req.user.isAdmin){
-    return next(errorHandler(403, "You are not allowed to see all users"))
+export const getUsers = async (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return next(errorHandler(403, "You are not allowed to see all users"));
   }
   try {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 5;
-    const sortDirection = req.query.sort === 'asc'?1:-1;
+    const sortDirection = req.query.sort === "asc" ? 1 : -1;
 
-    const users = await User.find().sort({createdAt:sortDirection})
-    .skip(startIndex).limit(limit);
+    const users = await User.find()
+      .sort({ createdAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
 
-    const usersWithoutPassword = users.map((user)=>{
-      const {password, ...rest} = user._doc;
-      return rest
-    })
+    const usersWithoutPassword = users.map((user) => {
+      const { password, ...rest } = user._doc;
+      return rest;
+    });
 
     const totalUsers = await User.countDocuments();
 
@@ -96,12 +101,12 @@ export const getUsers = async (req, res, next)=>{
 
     const oneMonthAgo = new Date(
       now.getFullYear(),
-      now.getMonth()-1,
+      now.getMonth() - 1,
       now.getDate()
-    )
+    );
 
     const lastMonthUsers = await User.countDocuments({
-      createdAt: {$gte: oneMonthAgo},
+      createdAt: { $gte: oneMonthAgo },
     });
 
     res.status(200).json({
@@ -109,8 +114,20 @@ export const getUsers = async (req, res, next)=>{
       totalUsers,
       lastMonthUsers,
     });
-
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
+export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
+    const { password, ...rest } = user._doc;
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
