@@ -89,11 +89,11 @@ export default function Search() {
       return;
     } else {
       const data = await res.json();
-      setPosts([...posts, data.posts]);
-      if (data.posts.length <= 5) {
-        setShowMore(true);
-      } else {
+      setPosts([...posts, ...data.posts]);
+      if (data.posts.length < 5) {
         setShowMore(false);
+      } else {
+        setShowMore(true);
       }
     }
   };
