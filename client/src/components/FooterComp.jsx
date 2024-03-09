@@ -30,10 +30,10 @@ const FooterComp = () => {
                   MoviePro project
                 </Footer.Link>
                 <Footer.Link
-                  href="https://moviepro-alpha.vercel.app/"
+                  href="https://fullstack-blog-app-mern.onrender.com/"
                   target="_blank"
                 >
-                  MoviePro project
+                  Fullstack blog app MERN
                 </Footer.Link>
               </Footer.LinkGroup>
             </div>
